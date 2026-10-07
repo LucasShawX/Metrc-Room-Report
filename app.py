@@ -75,9 +75,12 @@ def read_metrc(upload):
         out["Room"] = out["Room"] + sub.where(sub.eq(""), " / " + sub)
     out["Phase Date"] = pd.to_datetime(df[phase_date], errors="coerce") if phase_date else pd.NaT
     out = out[out["Tag"].notna() & out["Tag"].ne("") & out["Tag"].ne("nan")].copy()
-    out["Tag Number"] = pd.to_numeric(out["Tag"].str.extract(r"(\d+)$")[0], errors="coerce")
+    # Parse tag suffixes with Python integers instead of pandas numeric conversion.
+    # METRC tags can exceed fixed-width integer limits; pd.to_numeric may coerce
+    # them to floating point and silently alter the last digits.
+    tag_suffix = out["Tag"].str.extract(r"(\d+)$")[0]
+    out["Tag Number"] = tag_suffix.map(lambda value: int(value) if pd.notna(value) else None)
     out = out[out["Tag Number"].notna()].copy()
-    out["Tag Number"] = out["Tag Number"].astype(int)
     out["Facility"] = facility_from_filename(upload.name)
     out["Phase"] = phase_from_filename(upload.name)
     return out
