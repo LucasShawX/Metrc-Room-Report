@@ -12,6 +12,15 @@ Upload one or more METRC plant Excel exports and generate a grouped room report 
 - Plant counts and total plants
 - Downloadable PDF and Excel reports
 
+## macOS setup
+1. Install Python 3.11 or newer from python.org if it is not already installed.
+2. Clone or download this repository.
+3. Double-click `run_mac.command`.
+4. On the first launch, the script creates a local virtual environment and installs the required packages.
+5. Streamlit opens the app in your browser. Upload the METRC Excel export and download the report.
+
+If macOS blocks the script the first time, right-click `run_mac.command`, choose **Open**, then confirm **Open**.
+
 ## Windows setup
 1. Install Python 3.11 or newer from python.org. During installation, select **Add Python to PATH**.
 2. Extract this folder.
@@ -32,3 +41,10 @@ streamlit run app.py
 - Phase Date is optional.
 - You can upload exports from multiple facilities at once; the report keeps facilities separate.
 - Discontinuous tag sequences are automatically split into separate ranges.
+
+
+## Mac compatibility note
+The app itself is cross-platform Python. `run_app.bat` is for Windows; `run_mac.command` is the macOS launcher.
+
+## Tag precision fix
+This fork preserves long METRC tag suffixes as Python integers when building tag ranges, avoiding floating-point precision loss on very long tag values.
