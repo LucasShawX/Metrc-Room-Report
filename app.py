@@ -105,8 +105,15 @@ def summarize(df, digits):
     group_cols = ["Facility", "Phase", "Room", "Strain"]
     for keys, group in df.groupby(group_cols, dropna=False, sort=True):
         facility, phase, room, strain = keys
-        dates = group["Phase Date"].dropna()
-        date_text = ", ".join(sorted({d.strftime("%m/%d/%Y") for d in dates})) if len(dates) else ""
+        dates = group["Phase Date"].dropna().sort_values()
+        if len(dates):
+            unique_dates = sorted({d.normalize() for d in dates})
+            if (unique_dates[-1] - unique_dates[0]).days <= 28:
+                date_text = unique_dates[0].strftime("%m/%d/%Y")
+            else:
+                date_text = ", ".join(d.strftime("%m/%d/%Y") for d in unique_dates)
+        else:
+            date_text = ""
         for start, end in make_ranges(group["Tag Number"]):
             mask = group["Tag Number"].between(start, end)
             start_text = str(start)[-digits:].zfill(digits)
